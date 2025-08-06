@@ -156,7 +156,7 @@ class UserController extends Controller
         try {
             // Logic to get user points
             $user = Auth::user();
-
+            dd($user);
             if (!$user) {
                 return response()->json([
                     'code' => '401',
