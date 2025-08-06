@@ -12,11 +12,6 @@ class RewardController extends Controller
         try {
             $dataReward = Reward::select('id', 'title', 'image', 'point')->orderBy('point', 'desc')->get();
 
-            $dataReward = $dataReward->map(function ($reward) {
-                $reward->image = env('APP_URL') . '/storage/' . $reward->image;
-                return $reward;
-            });
-
             return response()->json([
                 'code' => '200',
                 'status' => 'success',
@@ -40,7 +35,7 @@ class RewardController extends Controller
                     'title' => 'required|string|max:255',
                     'description' => 'nullable|string',
                     'point' => 'required|integer|min:1',
-                    'image' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+                    'image' => 'required|string'
                 ]);
             } catch (\Illuminate\Validation\ValidationException $e) {
                 return response()->json([
@@ -50,9 +45,12 @@ class RewardController extends Controller
                 ], 400);
             }
 
-            $imagePath = $request->file('image')->store('rewards', 'public');
-
-            $reward = Reward::create(array_merge($request->all(), ['image' => $imagePath]));
+            $reward = Reward::create([
+                'title' => $request->title,
+                'description' => $request->description,
+                'point' => $request->point,
+                'image' => $request->image,
+            ]);
 
             return response()->json([
                 'code' => '201',
@@ -73,8 +71,6 @@ class RewardController extends Controller
     {
         try {
             $reward = Reward::findOrFail($id);
-
-            $reward->image = env('APP_URL') . '/storage/' . $reward->image;
 
             return response()->json([
                 'code' => '200',
