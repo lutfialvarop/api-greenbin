@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -186,13 +187,15 @@ class UserController extends Controller
     public function leaderboard()
     {
         try {
-            $topUsers = Transaction::select('users.name')
-                ->join('users', 'transactions.user_id', '=', 'users.id')
+            $topUsers = Transaction::join('users', 'transactions.user_id', '=', 'users.id')
+                ->select(
+                    'users.name',
+                    DB::raw('SUM(transactions.point) as total_points') // 2. Gabungkan select dan beri alias
+                )
+                ->where('transactions.status_point', 1) // 1. Tentukan kolom status_point dari tabel mana
                 ->groupBy('users.id', 'users.name')
-                ->where('status_point', 1)
-                ->havingRaw('SUM(point) > 0')
-                ->selectRaw('SUM(point) as point')
-                ->orderBy('point', 'desc')
+                ->havingRaw('SUM(transactions.point) > 0') // 1. Tentukan kolom point dari tabel mana
+                ->orderBy('total_points', 'desc') // 3. Urutkan berdasarkan alias baru
                 ->limit(10)
                 ->get();
 
