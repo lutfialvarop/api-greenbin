@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -171,6 +172,65 @@ class UserController extends Controller
                 'message' => 'Berhasil mendapatkan jumlah poin',
                 'data' => [
                     'points' => $user->point // Assuming point is a field in the User model
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => '500',
+                'status' => 'error',
+                'message' => 'Internal Server Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function leaderboard()
+    {
+        try {
+            $topUsers = Transaction::select('users.name')
+                ->join('users', 'transactions.user_id', '=', 'users.id')
+                ->groupBy('users.id', 'users.name')
+                ->where('status_point', 1)
+                ->havingRaw('SUM(point) > 0')
+                ->selectRaw('SUM(point) as point')
+                ->orderBy('point', 'desc')
+                ->limit(10)
+                ->get();
+
+            return response()->json([
+                'code' => '200',
+                'status' => 'success',
+                'message' => 'Berhasil mendapatkan leaderboard',
+                'data' => $topUsers
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'code' => '500',
+                'status' => 'error',
+                'message' => 'Internal Server Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getBadge()
+    {
+        try {
+            // Logic to get user badge
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json([
+                    'code' => '401',
+                    'status' => 'error',
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+
+            return response()->json([
+                'code' => '200',
+                'status' => 'success',
+                'message' => 'Berhasil mendapatkan badge',
+                'data' => [
+                    'badge' => $user->badge // Assuming badge is a field in the User model
                 ]
             ]);
         } catch (\Throwable $e) {
