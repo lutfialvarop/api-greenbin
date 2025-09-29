@@ -38,5 +38,10 @@ Route::prefix('v1')->group(function () {
     Route::prefix('profile')->middleware('auth:sanctum')->group(function () {
         Route::get('/', [UserController::class, 'getDetailProfile']);
         Route::get('/point', [UserController::class, 'getPoint']);
+        Route::get('/badge', [UserController::class, 'getBadge']);
+    });
+
+    Route::prefix('leaderboard')->group(function () {
+        Route::post('/', [UserController::class, 'leaderboard']);
     });
 });
