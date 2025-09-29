@@ -42,6 +42,6 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('leaderboard')->group(function () {
-        Route::post('/', [UserController::class, 'leaderboard']);
+        Route::get('/', [UserController::class, 'leaderboard']);
     });
 });
