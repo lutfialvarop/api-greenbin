@@ -192,10 +192,11 @@ class UserController extends Controller
                     'users.name',
                     DB::raw('SUM(transactions.point) as total_points') // 2. Gabungkan select dan beri alias
                 )
-                ->where('transactions.status_point', 0) // 1. Tentukan kolom status_point dari tabel mana
+                ->where('transactions.status_point', 0)
+                ->whereMonth('transactions.updated_at', '=', now()->month)
                 ->groupBy('users.id', 'users.name')
-                ->havingRaw('SUM(transactions.point) > 0') // 1. Tentukan kolom point dari tabel mana
-                ->orderBy('total_points', 'desc') // 3. Urutkan berdasarkan alias baru
+                ->havingRaw('SUM(transactions.point) >= 0')
+                ->orderBy('total_points', 'desc')
                 ->limit(10)
                 ->get();
 
