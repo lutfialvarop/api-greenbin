@@ -10,7 +10,7 @@ class RewardController extends Controller
     public function getAll()
     {
         try {
-            $dataReward = Reward::select('id', 'title', 'image', 'point')->orderBy('point', 'desc')->get();
+            $dataReward = Reward::select('id', 'title', 'image', 'point')->orderBy('point', 'asc')->get();
 
             return response()->json([
                 'code' => '200',
