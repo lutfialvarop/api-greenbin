@@ -142,6 +142,7 @@ class UserController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
+                    'badge' => $user->badge
                 ]
             ]);
         } catch (\Throwable $e) {
